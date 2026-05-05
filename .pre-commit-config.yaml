@@ -17,6 +17,7 @@ repos:
       - id: mypy
         args: [--config-file=pyproject.toml]
         additional_dependencies:
+          - pytest
           - pandas-stubs>=2.0.0
           - types-openpyxl>=3.1.5
           - types-tqdm
@@ -25,7 +26,7 @@ repos:
     rev: 1.7.10
     hooks:
       - id: bandit
-        args: [-r, src/, -q]
+        args: [-r]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

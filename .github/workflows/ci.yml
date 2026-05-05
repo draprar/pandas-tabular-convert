@@ -47,16 +47,15 @@ jobs:
         run: ruff format --check src/ tests/
 
       - name: Type check with mypy
-        run: mypy src/
+        run: mypy --config-file pyproject.toml src/
 
       - name: Security check with bandit
-        run: bandit -r src/ -q
+        run: bandit -r src/
 
       - name: Check dependencies with pip-audit
         run: pip-audit
 
       - name: Run tests with coverage
-        run: pytest --cov=src/file_converter --cov-report=term-missing --cov-fail-under=75
-
+        run: pytest --cov=src/file_converter --cov-report=term-missing --cov-fail-under=80
       - name: Verify CLI installation
         run: convert --list-formats
