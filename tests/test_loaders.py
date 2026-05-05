@@ -1,7 +1,9 @@
 """
 Comprehensive loader tests for all supported formats.
 """
+
 import json
+
 import pandas as pd
 import pytest
 
@@ -78,10 +80,10 @@ class TestJSONLoader:
         file = tmp_path / "data.json"
         data = [
             {"event": "login", "timestamp": "2024-01-15 10:00:00"},
-            {"event": "logout", "timestamp": "2024-01-15 11:00:00"}
+            {"event": "logout", "timestamp": "2024-01-15 11:00:00"},
         ]
         file.write_text(json.dumps(data))
-        
+
         # Ensure env var is NOT set
         monkeypatch.delenv("PARSE_JSON_DATETIME", raising=False)
 
@@ -102,10 +104,14 @@ class TestJSONLoader:
         """Test that datetime parsing works when explicitly enabled."""
         file = tmp_path / "data.json"
         data = [
-            {"event": "login", "created_date": "2024-01-15", "modified_time": "2024-01-15 10:00:00"},
+            {
+                "event": "login",
+                "created_date": "2024-01-15",
+                "modified_time": "2024-01-15 10:00:00",
+            },
         ]
         file.write_text(json.dumps(data))
-        
+
         monkeypatch.setenv("PARSE_JSON_DATETIME", "1")
 
         loader = JSONLoader()
@@ -121,10 +127,10 @@ class TestJSONLoader:
         # "runtime" contains non-date values - should NOT be affected without env var
         data = [
             {"event": "video", "runtime": "120 mins"},
-            {"event": "movie", "runtime": "invalid_date"}
+            {"event": "movie", "runtime": "invalid_date"},
         ]
         file.write_text(json.dumps(data))
-        
+
         monkeypatch.delenv("PARSE_JSON_DATETIME", raising=False)
 
         loader = JSONLoader()
@@ -142,10 +148,7 @@ class TestParquetLoader:
     def test_load_parquet(self, tmp_path):
         """Test loading Parquet file."""
         file = tmp_path / "data.parquet"
-        df_original = pd.DataFrame({
-            "id": [1, 2, 3],
-            "value": [10.5, 20.5, 30.5]
-        })
+        df_original = pd.DataFrame({"id": [1, 2, 3], "value": [10.5, 20.5, 30.5]})
         df_original.to_parquet(file, index=False)
 
         loader = ParquetLoader()
@@ -169,9 +172,9 @@ class TestPickleLoader:
         monkeypatch.delenv("UNSAFE_PICKLE", raising=False)
 
         loader = PickleLoader()
-        
+
         # Should raise RuntimeError when env var is not set
-        with pytest.raises(RuntimeError, match="disabled by default"):
+        with pytest.raises(RuntimeError, match="Pickle loading disabled"):
             loader.load(file)
 
     def test_pickle_enabled_with_env_var(self, tmp_path, monkeypatch):
@@ -200,4 +203,3 @@ class TestPickleLoader:
         df = loader.load(file)
 
         assert df.shape == (2, 1)
-

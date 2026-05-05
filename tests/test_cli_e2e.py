@@ -2,22 +2,21 @@
 End-to-end CLI tests.
 Tests CLI interface, exit codes, error handling, and user-facing behavior.
 """
-import sys
-import subprocess
 
-import pytest
+import subprocess
+import sys
+
 import pandas as pd
+import pytest
 
 
 @pytest.fixture
 def sample_csv(tmp_path):
     """Create sample CSV file for testing."""
     file = tmp_path / "sample.csv"
-    df = pd.DataFrame({
-        "name": ["Alice", "Bob", "Charlie"],
-        "age": [30, 25, 35],
-        "city": ["NYC", "LA", "Chicago"]
-    })
+    df = pd.DataFrame(
+        {"name": ["Alice", "Bob", "Charlie"], "age": [30, 25, 35], "city": ["NYC", "LA", "Chicago"]}
+    )
     df.to_csv(file, index=False)
     return file
 
@@ -26,11 +25,9 @@ def sample_csv(tmp_path):
 def sample_json(tmp_path):
     """Create sample JSON file for testing."""
     import json
+
     file = tmp_path / "sample.json"
-    data = [
-        {"id": 1, "value": 100},
-        {"id": 2, "value": 200}
-    ]
+    data = [{"id": 1, "value": 100}, {"id": 2, "value": 200}]
     file.write_text(json.dumps(data))
     return file
 
@@ -72,15 +69,15 @@ class TestCLIConversion:
     def test_csv_to_parquet_default(self, sample_csv, tmp_path, monkeypatch):
         """Test default conversion from CSV to Parquet."""
         from file_converter.cli import main
-        
+
         monkeypatch.setattr("file_converter.cli.DATA_INPUT_DIR", sample_csv.parent)
         monkeypatch.setattr("file_converter.cli.DATA_OUTPUT_DIR", tmp_path)
         monkeypatch.setattr("sys.argv", ["convert", str(sample_csv)])
 
         exit_code = main()
-        
+
         assert exit_code == 0
-        
+
         output_file = tmp_path / "sample.parquet"
         assert output_file.exists()
 
@@ -91,13 +88,12 @@ class TestCLIConversion:
 
         output_file = tmp_path / "result.csv"
         exit_code, stdout, stderr = run_convert_cli(
-            [str(sample_csv), str(output_file)],
-            cwd=tmp_path
+            [str(sample_csv), str(output_file)], cwd=tmp_path
         )
 
         assert exit_code == 0
         assert output_file.exists()
-        
+
         df = pd.read_csv(output_file)
         assert df.shape == (3, 3)
 
@@ -108,8 +104,7 @@ class TestCLIConversion:
 
         output_file = tmp_path / "output.csv"
         exit_code, stdout, stderr = run_convert_cli(
-            [str(sample_json), str(output_file)],
-            cwd=tmp_path
+            [str(sample_json), str(output_file)], cwd=tmp_path
         )
 
         assert exit_code == 0
@@ -124,10 +119,7 @@ class TestCLIPreview:
         monkeypatch.setattr("file_converter.cli.DATA_INPUT_DIR", sample_csv.parent)
         monkeypatch.setattr("file_converter.cli.DATA_OUTPUT_DIR", tmp_path)
 
-        exit_code, stdout, stderr = run_convert_cli(
-            [str(sample_csv), "--preview"],
-            cwd=tmp_path
-        )
+        exit_code, stdout, stderr = run_convert_cli([str(sample_csv), "--preview"], cwd=tmp_path)
 
         assert exit_code == 0
         assert "Rows: 3" in stdout
@@ -143,11 +135,9 @@ class TestCLIDropEmpty:
         """Test that --drop-empty removes columns with all NaN values."""
         # Create CSV with empty column
         csv_file = tmp_path / "data_with_empty.csv"
-        df = pd.DataFrame({
-            "col1": [1, 2, 3],
-            "empty_col": [None, None, None],
-            "col2": ["a", "b", "c"]
-        })
+        df = pd.DataFrame(
+            {"col1": [1, 2, 3], "empty_col": [None, None, None], "col2": ["a", "b", "c"]}
+        )
         df.to_csv(csv_file, index=False)
 
         monkeypatch.setattr("file_converter.cli.DATA_INPUT_DIR", tmp_path)
@@ -155,12 +145,11 @@ class TestCLIDropEmpty:
 
         output_file = tmp_path / "result.csv"
         exit_code, stdout, stderr = run_convert_cli(
-            [str(csv_file), str(output_file), "--drop-empty"],
-            cwd=tmp_path
+            [str(csv_file), str(output_file), "--drop-empty"], cwd=tmp_path
         )
 
         assert exit_code == 0
-        
+
         result = pd.read_csv(output_file)
         assert list(result.columns) == ["col1", "col2"]
 
@@ -175,8 +164,7 @@ class TestCLIErrorHandling:
 
         output_file = tmp_path / "output.xyz"
         exit_code, stdout, stderr = run_convert_cli(
-            [str(sample_csv), str(output_file)],
-            cwd=tmp_path
+            [str(sample_csv), str(output_file)], cwd=tmp_path
         )
 
         assert exit_code == 1
@@ -190,11 +178,7 @@ class TestCLIErrorHandling:
         monkeypatch.setattr("file_converter.cli.DATA_INPUT_DIR", tmp_path)
         monkeypatch.setattr("file_converter.cli.DATA_OUTPUT_DIR", tmp_path)
 
-        exit_code, stdout, stderr = run_convert_cli(
-            [str(bad_json)],
-            cwd=tmp_path
-        )
+        exit_code, stdout, stderr = run_convert_cli([str(bad_json)], cwd=tmp_path)
 
         assert exit_code == 1
         assert "Error" in stderr
-

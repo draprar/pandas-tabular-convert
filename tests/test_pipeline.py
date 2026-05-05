@@ -54,4 +54,3 @@ def test_load_error_message_lists_formats(tmp_path):
     assert ".csv" in error_msg
     assert ".parquet" in error_msg
     assert ".json" in error_msg
-

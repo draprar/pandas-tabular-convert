@@ -1,9 +1,6 @@
 from pathlib import Path
 
-from file_converter.cli import (
-    resolve_input_path,
-    resolve_output_path
-)
+from file_converter.cli import resolve_input_path, resolve_output_path
 
 
 def test_resolve_input_direct_path(tmp_path):
