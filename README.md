@@ -1,5 +1,10 @@
 # Tabular Convert
 
+![CI](https://github.com/draprar/pandas-tabular-convert/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Code style](https://img.shields.io/badge/code%20style-ruff-261230)
+
 CLI tool for converting tabular data between common formats into a unified Pandas DataFrame and exporting it to CSV or Parquet.
 
 ## Features
