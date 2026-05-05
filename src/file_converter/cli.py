@@ -2,10 +2,9 @@ import argparse
 import sys
 from pathlib import Path
 
-from file_converter.core.pipeline import load_file, LOADERS
+from file_converter.core.pipeline import LOADERS, load_file
 from file_converter.exporters.csv_exporter import export_csv
 from file_converter.exporters.parquet_exporter import export_parquet
-
 
 DATA_INPUT_DIR = Path("data/input")
 DATA_OUTPUT_DIR = Path("data/output")
@@ -14,17 +13,17 @@ DATA_OUTPUT_DIR = Path("data/output")
 def resolve_input_path(input_arg: str) -> Path:
     """
     Resolve input file path.
-    
+
     Resolution order:
     1. If absolute/relative path exists -> use it
     2. Otherwise search in data/input/
-    
+
     Args:
         input_arg: Input file path or filename.
-        
+
     Returns:
         Resolved Path object.
-        
+
     Raises:
         FileNotFoundError: If file cannot be found.
     """
@@ -43,18 +42,18 @@ def resolve_input_path(input_arg: str) -> Path:
 def resolve_output_path(output_arg: str | None, input_path: Path) -> Path:
     """
     Resolve output file path.
-    
+
     Rules:
     - If provided:
         - If only filename -> save to data/output/
         - If full path -> use as-is
     - If not provided:
         - Save to data/output/ with .parquet extension
-    
+
     Args:
         output_arg: Optional output file path or filename.
         input_path: Input Path object (used for default naming).
-        
+
     Returns:
         Resolved output Path object.
     """
@@ -72,33 +71,21 @@ def resolve_output_path(output_arg: str | None, input_path: Path) -> Path:
 def main() -> int:
     """
     Main CLI entry point for tabular data conversion.
-    
+
     Returns:
         Exit code (0 for success, 1 for error).
     """
-    parser = argparse.ArgumentParser(
-        description="Universal tabular format converter"
-    )
+    parser = argparse.ArgumentParser(description="Universal tabular format converter")
 
     parser.add_argument("input", nargs="?", help="Input file path")
     parser.add_argument("output", nargs="?", help="Optional output file path")
 
-    parser.add_argument(
-        "--preview",
-        action="store_true",
-        help="Show dataset structure"
-    )
+    parser.add_argument("--preview", action="store_true", help="Show dataset structure")
+
+    parser.add_argument("--list-formats", action="store_true", help="List supported formats")
 
     parser.add_argument(
-        "--list-formats",
-        action="store_true",
-        help="List supported formats"
-    )
-
-    parser.add_argument(
-        "--drop-empty",
-        action="store_true",
-        help="Drop columns with all NaN values"
+        "--drop-empty", action="store_true", help="Drop columns with all NaN values"
     )
 
     args = parser.parse_args()
@@ -166,7 +153,10 @@ def main() -> int:
         elif suffix == ".parquet":
             export_parquet(df, output_path)
         else:
-            print(f"Error: Unsupported output format: {suffix} (Supported: .csv, .parquet)", file=sys.stderr)
+            print(
+                f"Error: Unsupported output format: {suffix} (Supported: .csv, .parquet)",
+                file=sys.stderr,
+            )
             return 1
     except Exception as e:
         print(f"Error exporting file: {type(e).__name__}: {e}", file=sys.stderr)
@@ -178,4 +168,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
