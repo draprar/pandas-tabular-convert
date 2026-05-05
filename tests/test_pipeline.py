@@ -70,7 +70,9 @@ def test_large_file_shows_loading_message(tmp_path, monkeypatch):
     with open(file, "w") as f:
         f.write("a,b,c,d,e,f,g,h,i,j\n")
         for i in range(rows):
-            f.write(f"{i},{i*2},{i*3},{i*4},{i*5},{i*6},{i*7},{i*8},{i*9},{i*10}\n")
+            f.write(
+                f"{i},{i * 2},{i * 3},{i * 4},{i * 5},{i * 6},{i * 7},{i * 8},{i * 9},{i * 10}\n"
+            )
 
     # Mock LARGE_FILE_THRESHOLD_MB to be very small (1 MB)
     from file_converter.core import pipeline

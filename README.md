@@ -35,10 +35,10 @@ UNSAFE_PICKLE=1 convert data.pkl
 pip install .
 ```
 
-### Development Mode
+Editable mode (recommended for development):
 
 ```
-pip install -e ".[dev]"
+pip install -e .
 ```
 
 After installation, CLI command becomes available: `convert`
@@ -75,12 +75,6 @@ List supported formats:
 
 ```
 convert --list-formats
-```
-
-Verbose mode (show detailed logs):
-
-```
-convert events.csv --verbose
 ```
 
 ---
